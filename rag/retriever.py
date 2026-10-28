@@ -15,9 +15,14 @@ EMBED_MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 class Retriever:
     def __init__(self):
         if not (INDEX_DIR / "corpus.faiss").exists():
-            raise FileNotFoundError(
-                "No index found. Run `python rag/build_index.py` first."
-            )
+            # The index is a generated artifact (gitignored, like a build
+            # output) and the Colab notebook builds it via an explicit cell
+            # before the app runs. Hugging Face Spaces has no equivalent
+            # pre-step — it just runs app.py directly — so build it here on
+            # first use instead of crashing. Produces the identical index
+            # content either way; this only changes *when* it gets built.
+            from rag.build_index import build
+            build()
         self.index = faiss.read_index(str(INDEX_DIR / "corpus.faiss"))
         self.metadata = json.loads((INDEX_DIR / "metadata.json").read_text(encoding="utf-8"))
         # Forced to CPU: this model is small and retrieval isn't latency-critical,

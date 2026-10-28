@@ -3,8 +3,8 @@
 
 Visual direction: a "field advisory console" — a precision-agriculture
 sensor/satellite readout aesthetic (animated grid backdrop, signal-green
-accent, monospace data readouts, score bars) rather than a generic
-rustic/cream farm-app look.
+accent, monospace data readouts, score bars, 3D depth on hover) rather than
+a generic rustic/cream farm-app look.
 """
 import html
 import time
@@ -49,10 +49,7 @@ CUSTOM_CSS = """
     }
 }
 
-/* The gradio-container is centered with a max-width, which otherwise leaves an
-   unstyled (browser-default, often black in dark mode) void on either side. */
 html, body { background: var(--km-bg) !important; margin: 0; }
-
 .gradio-container {
     font-family: 'IBM Plex Sans', 'Noto Sans Devanagari', 'Noto Sans Tamil', 'Noto Sans Telugu',
                  'Noto Sans Kannada', 'Noto Sans Bengali', sans-serif !important;
@@ -63,10 +60,8 @@ html, body { background: var(--km-bg) !important; margin: 0; }
 .gradio-container, .gradio-container * { color: var(--km-fg); }
 footer { display: none !important; }
 
-/* Dropdown popup (language selector) — unstyled by default, falls back to the
-   browser/OS dark popup chrome which clashes with the rest of the theme. */
-.gradio-container ul[role="listbox"],
-.gradio-container .options {
+/* Dropdown popup (language selector) */
+.gradio-container ul[role="listbox"], .gradio-container .options {
     background: var(--km-surface) !important; border: 1px solid var(--km-border) !important;
     border-radius: 10px !important; box-shadow: 0 12px 28px -12px rgba(0,0,0,.35) !important;
 }
@@ -78,15 +73,19 @@ footer { display: none !important; }
     background: var(--km-surface-2) !important; color: var(--km-accent) !important;
 }
 
-/* ---- hero ---- */
+/* ---- hero (3D mouse-tilt, see the inline script in the hero HTML block) ---- */
+#km-hero-outer { perspective: 1200px; margin-bottom: 16px; }
 #km-hero {
     position: relative; overflow: hidden; border-radius: 20px;
     background:
         radial-gradient(ellipse 120% 80% at 20% -10%, color-mix(in srgb, var(--km-accent) 16%, transparent), transparent 60%),
         var(--km-surface);
     border: 1px solid var(--km-border);
-    padding: 28px 28px 24px; margin-bottom: 16px;
+    padding: 30px 30px 26px;
+    transform-style: preserve-3d; transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--km-fg) 4%, transparent) inset;
 }
+#km-hero.km-tilt { box-shadow: 0 30px 60px -30px rgba(0,0,0,.35), 0 1px 0 color-mix(in srgb, var(--km-fg) 4%, transparent) inset; }
 #km-hero::before {
     content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .35;
     background-image:
@@ -99,7 +98,7 @@ footer { display: none !important; }
 @keyframes km-drift { from { background-position: 0 0, 0 0; } to { background-position: 34px 34px, -34px 34px; } }
 @media (prefers-reduced-motion: reduce) { #km-hero::before { animation: none; } }
 
-.km-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; position: relative; }
+.km-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; position: relative; transform: translateZ(30px); }
 .km-status-chip {
     display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace;
     font-size: .68rem; letter-spacing: .06em; color: var(--km-accent);
@@ -110,12 +109,21 @@ footer { display: none !important; }
 .km-status-chip .km-dot { width: 6px; height: 6px; border-radius: 99px; background: var(--km-accent); animation: km-pulse 1.8s ease-in-out infinite; }
 @keyframes km-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
 
-#km-hero .km-kicker { font-family: 'IBM Plex Mono', monospace; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--km-fg-dim); margin: 0 0 6px; position: relative; }
-.km-lockup { display: flex; align-items: center; gap: 10px; position: relative; }
-#km-hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.3rem; letter-spacing: -.01em; margin: 2px 0; color: var(--km-fg) !important; }
-#km-hero .km-lede { color: var(--km-fg-dim); font-size: .98rem; line-height: 1.55; max-width: 48ch; margin: 0; position: relative; }
+#km-hero .km-kicker { font-family: 'IBM Plex Mono', monospace; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--km-fg-dim); margin: 0 0 6px; position: relative; transform: translateZ(24px); }
+.km-lockup { display: flex; align-items: center; gap: 10px; position: relative; transform: translateZ(40px); }
+#km-hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.9rem, 5vw, 2.3rem); letter-spacing: -.01em; margin: 2px 0; color: var(--km-fg) !important; }
+#km-hero .km-lede { color: var(--km-fg-dim); font-size: .98rem; line-height: 1.55; max-width: 48ch; margin: 0; position: relative; transform: translateZ(18px); }
 
-/* ---- input row ---- */
+/* ---- console card (groups input + chips + button into one unit) ---- */
+#km-console {
+    margin-top: 16px !important; background: var(--km-surface) !important; border: 1px solid var(--km-border) !important;
+    border-radius: 18px !important; padding: 20px !important;
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--km-fg) 4%, transparent) inset !important;
+}
+#km-console-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; flex-wrap: wrap; gap: 6px; }
+.km-stats { display: flex; gap: 12px; font-family: 'IBM Plex Mono', monospace; font-size: .68rem; color: var(--km-fg-dim); }
+.km-stats b { color: var(--km-accent); font-weight: 600; }
+
 #km-input-row { gap: 10px !important; }
 #km-input-row textarea, #km-input-row input[type=text] {
     background: var(--km-surface-2) !important; border: 1px solid var(--km-border) !important;
@@ -132,20 +140,17 @@ footer { display: none !important; }
 
 #km-ask-btn {
     font-family: 'Syne', sans-serif !important; font-weight: 700 !important; letter-spacing: .02em !important;
-}
-#km-ask-btn {
     background: var(--km-accent) !important; border: none !important; color: #06130b !important;
     border-radius: 10px !important; transition: transform .15s, box-shadow .15s !important;
     box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--km-accent) 70%, transparent) !important;
+    margin-top: 6px !important;
 }
-#km-ask-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -8px color-mix(in srgb, var(--km-accent) 80%, transparent) !important; }
+#km-ask-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -10px color-mix(in srgb, var(--km-accent) 80%, transparent) !important; }
+#km-ask-btn:active { transform: translateY(0) scale(.985); }
 
 /* ---- example chips ---- */
-#km-chip-row { gap: 8px !important; flex-wrap: wrap !important; }
+#km-chip-row { gap: 8px !important; flex-wrap: wrap !important; margin-top: 14px !important; }
 .km-chip {
-    /* Chip labels include native-script text (Hindi/Tamil/Telugu), so the mono
-       face needs the same Noto Sans fallback stack as the rest of the page —
-       IBM Plex Mono alone doesn't cover those scripts. */
     font-family: 'IBM Plex Mono', 'Noto Sans Devanagari', 'Noto Sans Tamil', 'Noto Sans Telugu',
                  'Noto Sans Kannada', 'Noto Sans Bengali', monospace !important;
     font-size: .74rem !important; color: var(--km-fg-dim) !important;
@@ -154,21 +159,32 @@ footer { display: none !important; }
     transition: border-color .15s, color .15s, transform .15s !important;
 }
 .km-chip:hover { border-color: var(--km-accent) !important; color: var(--km-accent) !important; transform: translateY(-1px); }
+.km-chip:active { transform: translateY(0) scale(.97); }
 
 /* ---- answer card ---- */
-#km-answer-wrap { margin-top: 18px; animation: km-rise .5s cubic-bezier(.2,.8,.2,1) both; }
-@keyframes km-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+#km-answer-wrap { margin-top: 20px; animation: km-rise .55s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes km-rise { from { opacity: 0; transform: translateY(14px) scale(.98) rotateX(-4deg); } to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); } }
 .km-answer-card { border-radius: 16px; border: 1px solid var(--km-border); background: var(--km-surface); overflow: hidden; }
 .km-answer-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--km-border); background: var(--km-surface-2); }
 .km-answer-head .km-timing { font-family: 'IBM Plex Mono', monospace; font-size: .68rem; color: var(--km-fg-dim); }
 .km-answer-body { padding: 18px; font-size: 1.02rem; line-height: 1.7; }
 
-/* ---- sources ---- */
+/* ---- sources (3D perspective hover + staggered reveal) ---- */
 #km-sources-accordion { margin-top: 12px; background: transparent !important; border: none !important; }
-.km-src { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center;
+.km-src {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center;
     background: var(--km-surface); border: 1px solid var(--km-border); border-radius: 14px;
-    padding: 12px 16px; margin-bottom: 10px; transition: transform .18s, box-shadow .18s, border-color .18s; }
-.km-src:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -20px rgba(0,0,0,.35); border-color: color-mix(in srgb, var(--km-accent) 45%, var(--km-border)); }
+    padding: 12px 16px; margin-bottom: 10px; transform-style: preserve-3d;
+    transition: transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s, border-color .22s;
+    animation: km-rise .5s cubic-bezier(.2,.8,.2,1) both;
+}
+.km-src:nth-of-type(1) { animation-delay: .04s; } .km-src:nth-of-type(2) { animation-delay: .1s; }
+.km-src:nth-of-type(3) { animation-delay: .16s; } .km-src:nth-of-type(4) { animation-delay: .22s; }
+.km-src:hover {
+    transform: perspective(700px) rotateX(2deg) translateY(-3px);
+    box-shadow: 0 18px 32px -20px rgba(0,0,0,.4);
+    border-color: color-mix(in srgb, var(--km-accent) 45%, var(--km-border));
+}
 .km-src-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
     background: color-mix(in srgb, var(--km-accent) 14%, transparent); flex: none; font-size: 1rem; }
 .km-src-main { min-width: 0; }
@@ -179,15 +195,43 @@ footer { display: none !important; }
 .km-score { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-family: 'IBM Plex Mono', monospace; }
 .km-score .km-val { font-size: .76rem; color: var(--km-accent); }
 .km-bar { width: 58px; height: 4px; border-radius: 99px; background: var(--km-surface-2); overflow: hidden; }
-.km-bar i { display: block; height: 100%; background: var(--km-accent); border-radius: 99px; }
+.km-bar i { display: block; height: 100%; background: var(--km-accent); border-radius: 99px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
 
-#km-footer { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: .7rem; color: var(--km-fg-dim); margin-top: 24px; padding-bottom: 8px; }
+#km-footer { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: .7rem; color: var(--km-fg-dim); margin-top: 26px; padding-bottom: 8px; }
 #km-footer b { color: var(--km-fg); }
 
-@media (max-width: 480px) {
+@media (max-width: 560px) {
+    #km-input-row { flex-direction: column !important; }
+    #km-language { min-width: 0 !important; width: 100% !important; }
     .km-src { grid-template-columns: auto 1fr; grid-template-rows: auto auto; }
     .km-score { grid-column: 1 / -1; flex-direction: row; justify-content: flex-start; margin-top: 4px; }
+    #km-hero h1 { font-size: 1.9rem; }
+    .km-stats { display: none; }
 }
+"""
+
+# Subtle 3D tilt on the hero, following the cursor. Self-contained and safe
+# since the hero is static content the real app never re-renders.
+HERO_TILT_SCRIPT = """
+<script>
+(function(){
+    var outer = document.getElementById('km-hero-outer');
+    var hero = document.getElementById('km-hero');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || !outer || !hero) return;
+    outer.addEventListener('mousemove', function(e){
+        var r = outer.getBoundingClientRect();
+        var px = (e.clientX - r.left) / r.width - 0.5;
+        var py = (e.clientY - r.top) / r.height - 0.5;
+        hero.style.transform = 'rotateY(' + (px*4) + 'deg) rotateX(' + (-py*4) + 'deg)';
+        hero.classList.add('km-tilt');
+    });
+    outer.addEventListener('mouseleave', function(){
+        hero.style.transform = 'rotateY(0) rotateX(0)';
+        hero.classList.remove('km-tilt');
+    });
+})();
+</script>
 """
 
 THEME = gr.themes.Soft(
@@ -266,6 +310,7 @@ def handle_chip(question: str, language: str):
 with gr.Blocks(css=CUSTOM_CSS, theme=THEME, title="Kisan Mitra — AI Farmer Advisory") as demo:
     gr.HTML(
         """
+        <div id="km-hero-outer">
         <div id="km-hero">
             <div class="km-brand">
                 <span class="km-status-chip"><span class="km-dot"></span>Live · Retrieval-grounded</span>
@@ -286,24 +331,35 @@ with gr.Blocks(css=CUSTOM_CSS, theme=THEME, title="Kisan Mitra — AI Farmer Adv
             government schemes. Every answer is traced back to the source it was grounded on,
             shown below.</p>
         </div>
+        </div>
         """
+        + HERO_TILT_SCRIPT
     )
 
-    with gr.Row(elem_id="km-input-row"):
-        question = gr.Textbox(
-            label="Your question",
-            placeholder="e.g. How do I control stem borer in paddy?",
-            lines=2,
-            scale=3,
+    with gr.Group(elem_id="km-console"):
+        gr.HTML(
+            """
+            <div id="km-console-label">
+                <p class="km-kicker" style="margin:0">Ask a question</p>
+                <div class="km-stats"><span><b>30+</b> sources</span><span><b>7</b> languages</span><span><b>RAG</b>-grounded</span></div>
+            </div>
+            """
         )
-        language = gr.Dropdown(LANGUAGES, value="English", label="Language", elem_id="km-language", scale=1, min_width=150)
+        with gr.Row(elem_id="km-input-row"):
+            question = gr.Textbox(
+                label="Your question",
+                placeholder="e.g. How do I control stem borer in paddy?",
+                lines=2,
+                scale=3,
+            )
+            language = gr.Dropdown(LANGUAGES, value="English", label="Language", elem_id="km-language", scale=1, min_width=150)
 
-    with gr.Row(elem_id="km-chip-row"):
-        chip_buttons = [
-            gr.Button(f"{ex['icon']} {ex['chip']}  ({ex['lang_code']})", elem_classes=["km-chip"], size="sm")
-            for ex in EXAMPLES
-        ]
-    ask_btn = gr.Button("Ask →", elem_id="km-ask-btn", size="lg")
+        with gr.Row(elem_id="km-chip-row"):
+            chip_buttons = [
+                gr.Button(f"{ex['icon']} {ex['chip']}  ({ex['lang_code']})", elem_classes=["km-chip"], size="sm")
+                for ex in EXAMPLES
+            ]
+        ask_btn = gr.Button("Ask Kisan Mitra →", elem_id="km-ask-btn", size="lg")
 
     with gr.Column(elem_id="km-answer-wrap"):
         answer_box = gr.HTML(EMPTY_STATE_HTML)

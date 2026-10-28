@@ -10,8 +10,11 @@ import html
 import time
 
 import gradio as gr
+import torch
 
 from pipeline import ask
+
+COLAB_URL = "https://colab.research.google.com/github/pranavpacha/AIfarmerassistant/blob/main/notebooks/colab_dev.ipynb"
 
 LANGUAGES = ["English", "Hindi", "Tamil", "Telugu", "Kannada", "Marathi", "Bengali"]
 
@@ -113,6 +116,17 @@ footer { display: none !important; }
 .km-lockup { display: flex; align-items: center; gap: 10px; position: relative; transform: translateZ(40px); }
 #km-hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.9rem, 5vw, 2.3rem); letter-spacing: -.01em; margin: 2px 0; color: var(--km-fg) !important; }
 #km-hero .km-lede { color: var(--km-fg-dim); font-size: .98rem; line-height: 1.55; max-width: 48ch; margin: 0; position: relative; transform: translateZ(18px); }
+
+/* ---- CPU-hardware notice (only rendered when no GPU is available) ---- */
+#km-cpu-notice {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: color-mix(in srgb, var(--km-accent-2) 10%, var(--km-surface));
+    border: 1px solid color-mix(in srgb, var(--km-accent-2) 35%, var(--km-border));
+    border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;
+    font-family: 'IBM Plex Mono', monospace; font-size: .74rem; color: var(--km-fg-dim);
+}
+#km-cpu-notice b { color: var(--km-accent-2); }
+#km-cpu-notice a { color: var(--km-accent); text-decoration: underline; text-underline-offset: 2px; }
 
 /* ---- console card (groups input + chips + button into one unit) ---- */
 #km-console {
@@ -394,6 +408,22 @@ with gr.Blocks(css=CUSTOM_CSS, theme=THEME, title="Kisan Mitra — AI Farmer Adv
         """
         + HERO_TILT_SCRIPT
     )
+
+    if not torch.cuda.is_available():
+        # Honest expectation-setting for free CPU hosting (e.g. a free HF
+        # Space): AgriParam's generation runs with use_cache=False (see
+        # agriparam_client.py), which is compute-bound and genuinely slow on
+        # CPU — this isn't hidden from the user, with a direct link to the
+        # fast GPU-backed Colab demo as an alternative.
+        gr.HTML(
+            f"""
+            <div id="km-cpu-notice">
+                <span>⚠ <b>Running on free CPU hardware</b> — responses can take several
+                minutes. For a fast GPU-backed demo, open the
+                <a href="{COLAB_URL}" target="_blank">Colab notebook</a> instead.</span>
+            </div>
+            """
+        )
 
     with gr.Group(elem_id="km-console"):
         gr.HTML(

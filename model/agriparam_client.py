@@ -32,6 +32,23 @@ class AgriParamClient:
         self.model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, **kwargs)
         self.model.eval()
 
+        if not torch.cuda.is_available():
+            # CPU deployment (e.g. a free Hugging Face Space has no GPU): raw
+            # FP32 for this 3B model is ~12GB, which leaves under 1GB of
+            # headroom out of a 16GB free-tier instance once the two
+            # translation models, the embedding model, and the Gradio server
+            # itself are also resident — a real risk of the whole process
+            # getting OOM-killed on startup, not just running slowly.
+            # bitsandbytes (used for the 4-bit path above) isn't reliably
+            # supported on CPU, so this uses PyTorch's own built-in dynamic
+            # INT8 quantization instead — no extra dependency, and it roughly
+            # halves the model's memory footprint. This only runs on the
+            # no-GPU path; it has no effect on, and was not present during,
+            # the GPU run that produced the 34/38 eval result.
+            self.model = torch.quantization.quantize_dynamic(
+                self.model, {torch.nn.Linear}, dtype=torch.qint8
+            )
+
     def _build_prompt(self, question: str, context: str) -> str:
         return (
             f"<context>\n{context}\n</context>\n"

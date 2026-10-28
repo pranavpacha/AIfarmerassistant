@@ -20,7 +20,10 @@ class Retriever:
             )
         self.index = faiss.read_index(str(INDEX_DIR / "corpus.faiss"))
         self.metadata = json.loads((INDEX_DIR / "metadata.json").read_text(encoding="utf-8"))
-        self.model = SentenceTransformer(EMBED_MODEL_NAME)
+        # Forced to CPU: this model is small and retrieval isn't latency-critical,
+        # so there's no good reason to spend GPU memory on it when AgriParam and
+        # two translation models are already competing for a T4's limited VRAM.
+        self.model = SentenceTransformer(EMBED_MODEL_NAME, device="cpu")
 
     def search(self, query: str, top_k: int = 4) -> list[dict]:
         q_emb = self.model.encode([query], normalize_embeddings=True)

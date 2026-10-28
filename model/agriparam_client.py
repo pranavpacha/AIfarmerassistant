@@ -11,11 +11,13 @@ MODEL_NAME = "bharatgenai/AgriParam"
 
 
 class AgriParamClient:
-    # 4-bit quantization is skipped by default: with use_cache=False below, every
-    # generation step recomputes full attention from scratch, and bnb's per-op
-    # dequantization overhead compounds badly under that workload. FP16 is both
-    # faster here and well within a T4's 16GB VRAM for a 3B model (~6GB).
-    def __init__(self, load_in_4bit: bool = False):
+    # 4-bit by default: FP16 (~5.4GB) left too little headroom once both
+    # translation models and the embedding model were also resident on a T4 —
+    # use_cache=False generation then OOM'd on essentially every call once all
+    # three were loaded. 4-bit (~2GB) trades generation speed for reliably
+    # fitting everything at once, which matters more for a one-time eval batch
+    # than per-query latency does.
+    def __init__(self, load_in_4bit: bool = True):
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=False)
         kwargs = dict(trust_remote_code=True, device_map="auto")
         if torch.cuda.is_available():
@@ -37,7 +39,7 @@ class AgriParamClient:
         )
 
     @torch.inference_mode()
-    def answer(self, question: str, context: str, max_new_tokens: int = 200) -> str:
+    def answer(self, question: str, context: str, max_new_tokens: int = 180) -> str:
         prompt = self._build_prompt(question, context)
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
         output = None

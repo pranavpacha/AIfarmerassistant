@@ -39,7 +39,16 @@ class _Direction:
             batch, truncation=True, padding="longest", max_length=256, return_tensors="pt"
         ).to(DEVICE)
         output_tokens = self.model.generate(
-            **inputs, num_beams=5, num_return_sequences=1, max_length=256
+            **inputs,
+            num_beams=5,
+            num_return_sequences=1,
+            max_length=256,
+            # AI4Bharat's custom modeling_indictrans.py has the same legacy
+            # tuple-cache assumption as AgriParam (see agriparam_client.py) —
+            # `past_key_values[0][0].shape` crashes under the Cache object current
+            # transformers passes by default. This model is only 200M params, so
+            # disabling cache costs negligible speed unlike the 3B AgriParam.
+            use_cache=False,
         )
         decoded = self.tokenizer.batch_decode(
             output_tokens, skip_special_tokens=True, clean_up_tokenization_spaces=True

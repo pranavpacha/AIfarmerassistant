@@ -1,0 +1,52 @@
+"""Load BharatGen AgriParam and generate grounded advisory answers from
+retrieved context, using the model's documented <user>/<context>/<assistant>
+prompt format."""
+from functools import lru_cache
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+MODEL_NAME = "bharatgenai/AgriParam"
+
+
+class AgriParamClient:
+    def __init__(self, load_in_4bit: bool = True):
+        self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=False)
+        kwargs = dict(trust_remote_code=True, device_map="auto")
+        if torch.cuda.is_available():
+            if load_in_4bit:
+                kwargs["load_in_4bit"] = True
+            else:
+                kwargs["torch_dtype"] = torch.bfloat16
+        else:
+            kwargs["torch_dtype"] = torch.float32
+        self.model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, **kwargs)
+        self.model.eval()
+
+    def _build_prompt(self, question: str, context: str) -> str:
+        return (
+            f"<context>\n{context}\n</context>\n"
+            f"<user>{question}</user>\n<assistant>"
+        )
+
+    @torch.inference_mode()
+    def answer(self, question: str, context: str, max_new_tokens: int = 256) -> str:
+        prompt = self._build_prompt(question, context)
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        output = self.model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=True,
+            temperature=0.3,
+            top_p=0.9,
+            repetition_penalty=1.15,
+            pad_token_id=self.tokenizer.eos_token_id,
+        )
+        generated = output[0][inputs["input_ids"].shape[1]:]
+        text = self.tokenizer.decode(generated, skip_special_tokens=True)
+        return text.split("</assistant>")[0].strip()
+
+
+@lru_cache(maxsize=1)
+def get_agriparam() -> AgriParamClient:
+    return AgriParamClient()

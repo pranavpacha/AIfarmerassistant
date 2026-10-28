@@ -1,0 +1,212 @@
+[
+  {
+    "id": "seed-001",
+    "crop": "Paddy (Rice)",
+    "category": "Pest Management",
+    "query": "How do I control stem borer in paddy?",
+    "answer": "Stem borer in paddy is best managed through an integrated approach: install pheromone traps (5 per acre) to monitor adult moth activity, release Trichogramma japonicum egg parasitoids at 5 cards/acre at weekly intervals from 2 weeks after transplanting, and avoid excess nitrogen which attracts the pest. If dead hearts exceed 5% or white ears exceed 2%, apply Cartap hydrochloride 4G at 4 kg/acre or Chlorantraniliprole 0.4G at 4 kg/acre in standing water. Drain and re-flood the field after 3 days for better efficacy."
+  },
+  {
+    "id": "seed-002",
+    "crop": "Paddy (Rice)",
+    "category": "Pest Management",
+    "query": "What is the treatment for brown plant hopper in rice?",
+    "answer": "Brown plant hopper (BPH) thrives in dense, over-fertilized crops with standing water. Avoid excess nitrogen, maintain alternate wetting and drying instead of continuous flooding, and conserve natural enemies like mirid bugs and spiders by avoiding broad-spectrum insecticides early in the season. If BPH population exceeds the economic threshold (10-15 hoppers per hill at tillering), apply Pymetrozine 50 WG at 300 g/acre or Imidacloprid 17.8 SL at 100 ml/acre, directed at the base of the plant where hoppers congregate."
+  },
+  {
+    "id": "seed-003",
+    "crop": "Paddy (Rice)",
+    "category": "Irrigation",
+    "query": "What is the best water management practice for rice to save water?",
+    "answer": "Alternate Wetting and Drying (AWD) is the recommended water-saving practice for rice. Install a perforated field water tube; irrigate only when the water level drops 15 cm below the soil surface, then flood to 5 cm depth. This can reduce irrigation water use by 15-30% compared to continuous flooding without yield loss, and also reduces methane emissions. Avoid AWD during flowering stage, which is sensitive to water stress and needs continuous shallow flooding."
+  },
+  {
+    "id": "seed-004",
+    "crop": "Wheat",
+    "category": "Sowing",
+    "query": "What is the ideal sowing time for wheat in North India?",
+    "answer": "In North India (Punjab, Haryana, Western UP), the optimum sowing window for irrigated wheat is 1-15 November. Delayed sowing beyond 25 November reduces yield by approximately 1-1.5% per day of delay due to terminal heat stress during grain filling. For timely-sown conditions use varieties like HD-3086 or PBW-725; for late sowing (after 25 Nov) use heat-tolerant varieties like HD-3271 or WH-1105 and increase seed rate by 20-25%."
+  },
+  {
+    "id": "seed-005",
+    "crop": "Wheat",
+    "category": "Disease Management",
+    "query": "How do I identify and treat yellow rust in wheat?",
+    "answer": "Yellow (stripe) rust appears as yellow-orange powdery pustules arranged in stripes along leaf veins, usually starting in cooler, humid conditions (Dec-Feb in North India). Scout fields weekly starting January. On first appearance, spray Propiconazole 25 EC at 1 ml/litre water or Tebuconazole 250 EC at 1 ml/litre, covering the whole canopy. A second spray after 15 days may be needed in severe outbreaks. Grow resistant varieties like DBW-187 or HD-3226 in rust-prone belts to reduce dependence on fungicides."
+  },
+  {
+    "id": "seed-006",
+    "crop": "Wheat",
+    "category": "Irrigation",
+    "query": "How many irrigations does wheat need and at which stages?",
+    "answer": "Wheat needs 4-6 irrigations depending on soil and rainfall. The most critical stages, in order of sensitivity to water stress, are: Crown Root Initiation (CRI, 20-25 days after sowing) — the single most critical irrigation; tillering (40-45 DAS); jointing (60-65 DAS); flowering (85-90 DAS); milk stage (100-105 DAS); and dough stage if needed. Never skip the CRI irrigation — missing it can cut yield by 20% or more."
+  },
+  {
+    "id": "seed-007",
+    "crop": "Cotton",
+    "category": "Pest Management",
+    "query": "How can I manage pink bollworm in cotton?",
+    "answer": "Pink bollworm management requires area-wide, season-long action: install pheromone traps (5/acre) from 45 days after sowing to monitor moth emergence, destroy crop residue and unopened bolls immediately after the last picking (do not store kapas with green bolls), avoid planting cotton before mid-April in regions with a mandated pink-bollworm-free period, and release Trichogramma bactrae at first trap catch. If larvae are found in 2-3% of green bolls, spray Profenofos 50 EC at 2 ml/litre or a recommended insect growth regulator; rotate chemical groups to delay resistance."
+  },
+  {
+    "id": "seed-008",
+    "crop": "Cotton",
+    "category": "Agronomy",
+    "query": "What spacing should I use for Bt cotton?",
+    "answer": "For irrigated Bt cotton, recommended spacing is 90x60 cm to 90x90 cm (row x plant) for normal hybrids, giving roughly 18,000-20,000 plants/acre. In high-density planting systems (HDPS) with compact varieties, spacing of 60x30 cm (about 45,000 plants/acre) can increase yield per acre but requires careful nutrient and growth management. Rainfed cotton typically uses wider spacing (90x90 cm) to reduce moisture competition."
+  },
+  {
+    "id": "seed-009",
+    "crop": "Maize",
+    "category": "Pest Management",
+    "query": "How do I control fall armyworm in maize?",
+    "answer": "Fall armyworm feeds inside the whorl, leaving characteristic window-pane damage and sawdust-like frass. Scout fields twice weekly from emergence. At early stages (2-3 leaf), apply need-based need Emamectin benzoate 5 SG at 4 g/10 litre water or Spinetoram 11.7 SC at 0.4 ml/litre, directed into the whorl in the evening when larvae are active. Intercropping with legumes and maintaining field hygiene reduces infestation. Avoid repeated use of the same chemical group to prevent resistance."
+  },
+  {
+    "id": "seed-010",
+    "crop": "Maize",
+    "category": "Nutrient Management",
+    "query": "What is the fertilizer schedule for hybrid maize?",
+    "answer": "For irrigated hybrid maize targeting 25-30 quintals/acre, apply 120:60:40 kg NPK/acre. Apply full phosphorus and potassium plus one-third nitrogen as basal dose at sowing; top-dress one-third nitrogen at knee-high stage (25-30 DAS) and the remaining one-third at tasseling (45-50 DAS). Apply zinc sulphate 10 kg/acre if soil test shows deficiency, since maize is highly sensitive to zinc deficiency."
+  },
+  {
+    "id": "seed-011",
+    "crop": "Sugarcane",
+    "category": "Agronomy",
+    "query": "How do I manage a sugarcane ratoon crop for better yield?",
+    "answer": "For good ratoon yield: harvest the plant crop close to the ground to leave healthy stubble, remove trash by burning only where permitted or shred and incorporate it as mulch, irrigate within 3-5 days of harvest to trigger sprouting, apply a gap-filling of setts in blank areas within 30 days, and apply the full recommended NPK dose slightly earlier than for plant crop since ratoon roots are shallower. Off-barring and earthing-up at 45 and 90 days respectively improves tillering and lodging resistance."
+  },
+  {
+    "id": "seed-012",
+    "crop": "Chickpea",
+    "category": "Disease Management",
+    "query": "What causes wilting in chickpea and how do I prevent it?",
+    "answer": "Chickpea wilt is usually caused by the soil-borne fungus Fusarium oxysporum f.sp. ciceris, which blocks the vascular system causing sudden drooping and drying, typically visible at flowering/podding stage. Prevention: use wilt-resistant varieties (e.g., JG-74, WR-315 derivatives), treat seed with Trichoderma viride at 4 g/kg seed or carbendazim at 2 g/kg seed before sowing, avoid sowing in fields with a history of wilt for at least 3 years, and maintain proper drainage since waterlogging worsens the disease."
+  },
+  {
+    "id": "seed-013",
+    "crop": "Tomato",
+    "category": "Disease Management",
+    "query": "How do I control late blight in tomato?",
+    "answer": "Late blight (Phytophthora infestans) spreads rapidly in cool, humid, cloudy weather and appears as water-soaked dark lesions on leaves with white fungal growth on the underside. Preventive sprays of Mancozeb 75 WP at 2.5 g/litre at 7-10 day intervals during favorable weather are effective before infection starts. Once symptoms appear, switch to a systemic fungicide like Metalaxyl + Mancozeb combination at 2 g/litre. Avoid overhead irrigation, ensure good field drainage, and remove and destroy infected plant debris."
+  },
+  {
+    "id": "seed-014",
+    "crop": "Onion",
+    "category": "Post-Harvest",
+    "query": "How should I store onions to reduce losses?",
+    "answer": "Cure onions in the field for 3-4 days after lifting (tops bent), then in shade for 10-15 days until the neck is fully dry. Store in well-ventilated structures such as slatted bamboo/wire-mesh chambers that allow airflow, in layers no more than 3-4 bulbs deep, away from direct sunlight and rain. Maintain storage temperature around 25-30°C with relative humidity below 70% to minimize sprouting and rotting. Remove bolted, damaged, or diseased bulbs before storage; routinely inspect and remove sprouting bulbs."
+  },
+  {
+    "id": "seed-015",
+    "crop": "Soybean",
+    "category": "Weed Management",
+    "query": "What is the best weed control strategy for soybean?",
+    "answer": "Apply a pre-emergence herbicide like Pendimethalin 30 EC at 1.0-1.3 litre/acre within 0-2 days of sowing on moist soil for broad-spectrum control of early weeds. Follow with one hand weeding or inter-row hoeing at 25-30 days after sowing to remove escapes, since soybean is most sensitive to weed competition between 15-45 days. Post-emergence options like Imazethapyr 10 SL at 400 ml/acre can be used at 15-20 DAS if pre-emergence was missed, applied on actively growing weeds with adequate soil moisture."
+  },
+  {
+    "id": "seed-016",
+    "crop": "General",
+    "category": "Soil Health",
+    "query": "How often should I get my soil tested and what does the Soil Health Card tell me?",
+    "answer": "Soil should ideally be tested once every 2-3 years, or before a new cropping cycle if yields have declined unexpectedly. The Government of India's Soil Health Card scheme provides a free soil test report every 2 years showing 12 parameters: N, P, K (macronutrients), S, Zn, Fe, Cu, Mn, Bo (micronutrients), and pH, EC, organic carbon. The card gives crop-wise fertilizer and amendment recommendations based on these values — follow the recommended dose rather than a blanket dose to avoid over-fertilization and save input cost. Contact your nearest Krishi Vigyan Kendra (KVK) or local agriculture department office to get your card."
+  },
+  {
+    "id": "seed-017",
+    "crop": "General",
+    "category": "Government Schemes",
+    "query": "What is PM-KISAN and how do I apply?",
+    "answer": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi) provides eligible landholding farmer families with Rs. 6,000 per year in three equal installments of Rs. 2,000, transferred directly to their bank account. To apply: register online at pmkisan.gov.in under 'New Farmer Registration' using your Aadhaar number, land records, and bank account details, or visit your nearest Common Service Centre (CSC) or local revenue/agriculture officer for assisted registration. eKYC (Aadhaar-based or biometric) is mandatory to receive installments — complete it on the portal or at a CSC if not already done."
+  },
+  {
+    "id": "seed-018",
+    "crop": "General",
+    "category": "Government Schemes",
+    "query": "How do I get crop insurance under PMFBY?",
+    "answer": "Pradhan Mantri Fasal Bima Yojana (PMFBY) covers yield losses from natural calamities, pests, and diseases. Farmers pay a low premium (2% of sum insured for Kharif crops, 1.5% for Rabi, 5% for commercial/horticultural crops); the rest is subsidized by the government. Loanee farmers are enrolled automatically by their bank unless they opt out; non-loanee farmers can enroll online at pmfby.gov.in or through their bank/CSC/insurance company agent before the cut-off date for that season and crop (usually announced by the state government). Report crop loss within 72 hours of the event through the app, portal, or helpline for localized claims."
+  },
+  {
+    "id": "seed-019",
+    "crop": "General",
+    "category": "Irrigation",
+    "query": "Is there a government subsidy for drip irrigation?",
+    "answer": "Yes — under the Pradhan Mantri Krishi Sinchayee Yojana (PMKSY), the Per Drop More Crop component subsidizes micro-irrigation (drip and sprinkler) installation, typically 55% of cost for small/marginal farmers and 45% for other farmers, with some states topping this up further with additional state-level subsidy. Apply through your state horticulture/agriculture department portal or via empaneled drip irrigation companies; a site inspection and water source verification is usually required before approval. Drip irrigation can reduce water use by 30-50% and improve fertilizer use efficiency when combined with fertigation."
+  },
+  {
+    "id": "seed-020",
+    "crop": "General",
+    "category": "Credit",
+    "query": "What is a Kisan Credit Card and how do I get one?",
+    "answer": "The Kisan Credit Card (KCC) provides farmers with timely, affordable credit for crop production, post-harvest expenses, and allied activities like dairy and fisheries, at a subsidized interest rate (effectively around 4% per annum for prompt repayment under the interest subvention scheme). Apply at any nearby bank branch (public, private, or cooperative) or RRB with land ownership documents, identity/address proof, and passport photos; many banks now also allow online application through their net-banking portal or the PM-KISAN portal via a simplified KCC form for existing PM-KISAN beneficiaries. Loan limit is based on the crop grown, area, and scale of finance fixed by the district-level technical committee."
+  },
+  {
+    "id": "seed-021",
+    "crop": "Groundnut",
+    "category": "Disease Management",
+    "query": "How do I manage leaf spot disease in groundnut?",
+    "answer": "Early and late leaf spot in groundnut appear as dark brown to black circular spots, often with a yellow halo, leading to premature defoliation. Use certified disease-free seed and a 3-year crop rotation avoiding groundnut/legumes. Spray Chlorothalonil 75 WP at 2 g/litre or Tebuconazole 250 EC at 1 ml/litre starting at first symptom appearance (usually 30-35 DAS), repeating at 15-day intervals for 2-3 sprays during favorable humid weather. Remove and destroy crop debris after harvest since the fungus survives on infected residue."
+  },
+  {
+    "id": "seed-022",
+    "crop": "Banana",
+    "category": "Nutrient Management",
+    "query": "What is the fertilizer requirement for banana?",
+    "answer": "For Grand Naine/Cavendish banana under drip fertigation, the recommended annual dose is approximately 200:60:300 g NPK/plant, split into 10-12 fertigation events from 2nd to 9th month after planting, applying higher proportions during the vegetative and bunching stages. Supplement with FYM/compost at 10-15 kg/plant at planting. Apply micronutrients (especially boron and zinc) if soil test or visual symptoms (such as bunchy top distortion or choke throat) indicate deficiency."
+  },
+  {
+    "id": "seed-023",
+    "crop": "Mustard",
+    "category": "Pest Management",
+    "query": "How do I control mustard aphid?",
+    "answer": "Mustard aphid colonies build up on tender shoots and inflorescence, usually from January onward in North India, sucking sap and reducing seed set. Monitor weekly from 30 DAS; the economic threshold is about 1 aphid per cm of shoot length or 10% infested plants. At threshold, spray Imidacloprid 17.8 SL at 40-50 ml/acre or Thiamethoxam 25 WG at 40 g/acre in 150-200 litres water, avoiding spray during flowering when bees are actively pollinating — spray in the early morning or late evening to protect pollinators."
+  },
+  {
+    "id": "seed-024",
+    "crop": "General",
+    "category": "Weather Advisory",
+    "query": "When is the right time to sow Kharif crops based on monsoon arrival?",
+    "answer": "Sow Kharif crops after receiving at least 75-100 mm of cumulative rainfall or when soil has adequate moisture at sowing depth (not just a light shower), typically within a week of the monsoon's stable onset in your region per IMD's district-level forecast. Sowing before adequate moisture arrives risks poor germination and re-sowing cost; sowing more than 2-3 weeks after a confirmed stable monsoon reduces the effective crop growth period and yield potential. Check the IMD Agromet Advisory Bulletin for your district (issued twice weekly) for the specific window and crop-wise recommendations."
+  },
+  {
+    "id": "seed-025",
+    "crop": "General",
+    "category": "Organic Farming",
+    "query": "How do I prepare and use Jeevamrit for my field?",
+    "answer": "Jeevamrit is a fermented microbial culture used in natural farming to boost soil microbial activity. Mix in 200 litres of water: 10 kg fresh cow dung, 5-10 litres aged cow urine, 2 kg jaggery, 2 kg pulse flour (besan), and a handful of soil from the field bund (as a microbial inoculant). Stir twice daily (morning and evening) and ferment for 5-7 days in shade. Apply through irrigation water or as a direct spray at 200 litres/acre once every 15-20 days during the crop season; it is not a substitute for primary nutrients in nutrient-deficient soils but improves microbial activity and nutrient availability over time."
+  },
+  {
+    "id": "seed-026",
+    "crop": "Potato",
+    "category": "Disease Management",
+    "query": "How do I prevent early blight in potato?",
+    "answer": "Early blight (Alternaria solani) shows as concentric 'target-board' brown spots on older leaves first, worsening in warm, humid conditions. Use certified disease-free seed tubers, maintain balanced nutrition (avoid nitrogen excess and potassium deficiency, both of which increase susceptibility), and ensure adequate plant spacing for airflow. Spray Mancozeb 75 WP at 2.5 g/litre preventively from 30 DAS, or switch to Azoxystrobin 23 SC at 1 ml/litre once symptoms appear, at 10-day intervals during favorable weather."
+  },
+  {
+    "id": "seed-027",
+    "crop": "General",
+    "category": "Nutrient Management",
+    "query": "What are the symptoms of zinc deficiency in crops and how do I correct it?",
+    "answer": "Zinc deficiency commonly shows as interveinal chlorosis (yellowing between veins while veins stay green) on younger leaves, stunted growth, and in rice specifically, khaira disease with bronzing of leaves. It is widespread in alkaline, calcareous, and heavily cropped soils. Correct it by soil application of zinc sulphate (21% or 33%) at 10-25 kg/acre once every 2-3 crop cycles (residual effect lasts several seasons), or a foliar spray of 0.5% zinc sulphate solution (5 g/litre) with a small amount of lime to avoid leaf scorch, repeated twice at 15-day intervals for a quicker fix during an active deficiency."
+  },
+  {
+    "id": "seed-028",
+    "crop": "General",
+    "category": "Pest Management",
+    "query": "How can I reduce pesticide use through Integrated Pest Management (IPM)?",
+    "answer": "IPM combines multiple tactics to keep pests below economically damaging levels while minimizing chemical use: use pest-resistant/tolerant varieties, practice crop rotation to break pest cycles, install pheromone traps and yellow/blue sticky traps for monitoring and mass trapping, conserve natural enemies (ladybird beetles, spiders, parasitic wasps) by avoiding unnecessary broad-spectrum sprays, use biopesticides (neem oil 3-5 ml/litre, Bacillus thuringiensis, Trichoderma, NPV) as a first line of defense, and apply chemical pesticides only when scouting shows pest levels crossing the economic threshold for that specific crop and pest, choosing the most target-specific and least persistent option available."
+  },
+  {
+    "id": "seed-029",
+    "crop": "Paddy (Rice)",
+    "category": "Nutrient Management",
+    "query": "What is the recommended fertilizer dose for transplanted paddy?",
+    "answer": "For transplanted high-yielding paddy varieties, the general recommendation is 120:60:40 kg NPK/hectare (roughly 48:24:16 kg/acre), adjusted per soil test. Apply full phosphorus and potassium plus one-third of nitrogen as basal dose at transplanting; apply the second third of nitrogen at active tillering (20-25 days after transplanting) and the final third at panicle initiation (40-45 DAT). Use a Leaf Color Chart (LCC) to fine-tune nitrogen timing and avoid both under- and over-application."
+  },
+  {
+    "id": "seed-030",
+    "crop": "General",
+    "category": "Weather Advisory",
+    "query": "How should I protect my standing crop from an approaching heavy rainfall or cyclone warning?",
+    "answer": "On receiving an IMD heavy-rainfall or cyclone warning: harvest any crop that is physiologically mature and can be safely harvested early; for standing crops that cannot be harvested, ensure field drains and bunds are clear to allow quick water outflow and avoid waterlogging; stake or provide support to tall/lodging-prone crops like maize and sugarcane; postpone any planned fertilizer or pesticide application until after the rain event to avoid wash-off and wastage; and move harvested produce, seed stock, and fertilizer bags to a covered, elevated storage area. Follow your state agriculture department's SMS/app-based Agromet advisory for crop-specific guidance issued ahead of the warning."
+  }
+]

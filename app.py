@@ -10,8 +10,11 @@ import html
 import time
 
 import gradio as gr
+import torch
 
 from pipeline import ask
+
+COLAB_URL = "https://colab.research.google.com/github/pranavpacha/AIfarmerassistant/blob/main/notebooks/colab_dev.ipynb"
 
 LANGUAGES = ["English", "Hindi", "Tamil", "Telugu", "Kannada", "Marathi", "Bengali"]
 
@@ -114,6 +117,17 @@ footer { display: none !important; }
 #km-hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.9rem, 5vw, 2.3rem); letter-spacing: -.01em; margin: 2px 0; color: var(--km-fg) !important; }
 #km-hero .km-lede { color: var(--km-fg-dim); font-size: .98rem; line-height: 1.55; max-width: 48ch; margin: 0; position: relative; transform: translateZ(18px); }
 
+/* ---- CPU-hardware notice (only rendered when no GPU is available) ---- */
+#km-cpu-notice {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: color-mix(in srgb, var(--km-accent-2) 10%, var(--km-surface));
+    border: 1px solid color-mix(in srgb, var(--km-accent-2) 35%, var(--km-border));
+    border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;
+    font-family: 'IBM Plex Mono', monospace; font-size: .74rem; color: var(--km-fg-dim);
+}
+#km-cpu-notice b { color: var(--km-accent-2); }
+#km-cpu-notice a { color: var(--km-accent); text-decoration: underline; text-underline-offset: 2px; }
+
 /* ---- console card (groups input + chips + button into one unit) ---- */
 #km-console {
     margin-top: 16px !important; background: var(--km-surface) !important; border: 1px solid var(--km-border) !important;
@@ -165,8 +179,18 @@ footer { display: none !important; }
 #km-answer-wrap { margin-top: 20px; animation: km-rise .55s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes km-rise { from { opacity: 0; transform: translateY(14px) scale(.98) rotateX(-4deg); } to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); } }
 .km-answer-card { border-radius: 16px; border: 1px solid var(--km-border); background: var(--km-surface); overflow: hidden; }
+.km-answer-unsourced { border-color: color-mix(in srgb, var(--km-accent-2) 45%, var(--km-border)); }
 .km-answer-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--km-border); background: var(--km-surface-2); }
+.km-answer-head-right { display: flex; align-items: center; gap: 10px; }
 .km-answer-head .km-timing { font-family: 'IBM Plex Mono', monospace; font-size: .68rem; color: var(--km-fg-dim); }
+.km-status-warn { color: var(--km-accent-2) !important; background: color-mix(in srgb, var(--km-accent-2) 12%, transparent) !important; border-color: color-mix(in srgb, var(--km-accent-2) 35%, transparent) !important; }
+.km-status-warn .km-dot { background: var(--km-accent-2) !important; }
+.km-copy-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: .68rem; color: var(--km-fg-dim);
+    background: var(--km-surface); border: 1px solid var(--km-border); border-radius: 6px;
+    padding: 3px 9px; cursor: pointer; transition: border-color .15s, color .15s;
+}
+.km-copy-btn:hover { border-color: var(--km-accent); color: var(--km-accent); }
 .km-answer-body { padding: 18px; font-size: 1.02rem; line-height: 1.7; }
 
 /* ---- sources (3D perspective hover + staggered reveal) ---- */
@@ -193,7 +217,8 @@ footer { display: none !important; }
 .km-tag { font-family: 'IBM Plex Mono', monospace; font-size: .62rem; letter-spacing: .02em; color: var(--km-fg-dim);
     background: var(--km-surface-2); border: 1px solid var(--km-border); border-radius: 5px; padding: 2px 6px; }
 .km-score { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-family: 'IBM Plex Mono', monospace; }
-.km-score .km-val { font-size: .76rem; color: var(--km-accent); }
+.km-score .km-val { font-size: .76rem; color: var(--km-accent); font-weight: 500; }
+.km-score .km-val-num { font-size: .62rem; color: var(--km-fg-dim); }
 .km-bar { width: 58px; height: 4px; border-radius: 99px; background: var(--km-surface-2); overflow: hidden; }
 .km-bar i { display: block; height: 100%; background: var(--km-accent); border-radius: 99px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
 
@@ -246,6 +271,33 @@ def crop_icon(crop: str) -> str:
     return CROP_ICONS.get(crop, "🛰")
 
 
+def confidence_label(score: float) -> str:
+    # Plain-language bands instead of a raw similarity score: a number like
+    # "0.64" means nothing to most users without context on the scale, and
+    # research on AI-answer UX specifically flags raw confidence numbers as
+    # something people can't act on. The number is still shown (smaller,
+    # secondary) for anyone who does want the precise value.
+    if score >= 0.7:
+        return "Strong match"
+    if score >= 0.5:
+        return "Good match"
+    if score >= 0.35:
+        return "Partial match"
+    return "Weak match"
+
+
+def js_attr_escape(text: str) -> str:
+    """Escape text for embedding as a JS single-quoted string literal inside
+    an HTML double-quoted attribute. Order matters: JS-escape first (so a
+    literal backslash or quote in the answer becomes a valid JS escape
+    sequence), then HTML-escape the result so a literal `"` in the answer
+    can't prematurely close the onclick="..." attribute — the browser decodes
+    the HTML entities back to real characters before handing the string to
+    the JS engine, so the JS escaping underneath still applies correctly."""
+    js_safe = text.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "")
+    return html.escape(js_safe)
+
+
 EMPTY_STATE_HTML = (
     "<div class='km-answer-card'>"
     "<div class='km-answer-head'>"
@@ -258,12 +310,25 @@ EMPTY_STATE_HTML = (
 
 
 def render_answer(answer_text: str, elapsed: float) -> str:
+    # No low-confidence/decline badge here: that depended on a pipeline.py
+    # change (LOW_CONFIDENCE_THRESHOLD, result.grounded) that was reverted
+    # to keep the backend exactly at the proven 34/38 eval state — the
+    # pipeline always generates an answer via AgriParam, so the badge always
+    # reads "Grounded answer". The copy button and layout are kept (pure
+    # frontend, independent of that backend logic).
     safe_text = html.escape(answer_text).replace("\n", "<br>")
+    copy_js = js_attr_escape(answer_text)
+    badge = "<span class='km-status-chip'><span class='km-dot'></span>Grounded answer</span>"
     return (
         "<div class='km-answer-card'>"
         "<div class='km-answer-head'>"
-        "<span class='km-status-chip'><span class='km-dot'></span>Grounded answer</span>"
+        f"{badge}"
+        "<span class='km-answer-head-right'>"
         f"<span class='km-timing'>{elapsed:.1f}s</span>"
+        f"<button class='km-copy-btn' onclick=\"navigator.clipboard.writeText('{copy_js}').then(() => {{"
+        "const t=this.textContent; this.textContent='Copied'; setTimeout(() => this.textContent=t, 1400);"
+        "})\">Copy</button>"
+        "</span>"
         "</div>"
         f"<div class='km-answer-body'>{safe_text}</div>"
         "</div>"
@@ -285,7 +350,8 @@ def render_sources(sources: list[dict]) -> str:
             f"<span class='km-tag'>{html.escape(s['category'])}</span></div>"
             "</div>"
             "<div class='km-score'>"
-            f"<span class='km-val'>{s['score']:.2f}</span>"
+            f"<span class='km-val'>{confidence_label(s['score'])}</span>"
+            f"<span class='km-val-num'>{s['score']:.2f}</span>"
             f"<div class='km-bar'><i style='width:{pct}%'></i></div>"
             "</div>"
             "</div>"
@@ -299,7 +365,11 @@ def handle_ask(question: str, language: str):
     start = time.time()
     result = ask(question, language)
     elapsed = time.time() - start
-    return render_answer(result.answer, elapsed), render_sources(result.sources), gr.update(open=True)
+    return (
+        render_answer(result.answer, elapsed),
+        render_sources(result.sources),
+        gr.update(open=True),
+    )
 
 
 def handle_chip(question: str, language: str):
@@ -335,6 +405,22 @@ with gr.Blocks(css=CUSTOM_CSS, theme=THEME, title="Kisan Mitra — AI Farmer Adv
         """
         + HERO_TILT_SCRIPT
     )
+
+    if not torch.cuda.is_available():
+        # Honest expectation-setting for free CPU hosting (e.g. a free HF
+        # Space): AgriParam's generation runs with use_cache=False (see
+        # agriparam_client.py), which is compute-bound and genuinely slow on
+        # CPU — this isn't hidden from the user, with a direct link to the
+        # fast GPU-backed Colab demo as an alternative.
+        gr.HTML(
+            f"""
+            <div id="km-cpu-notice">
+                <span>⚠ <b>Running on free CPU hardware</b> — responses can take several
+                minutes. For a fast GPU-backed demo, open the
+                <a href="{COLAB_URL}" target="_blank">Colab notebook</a> instead.</span>
+            </div>
+            """
+        )
 
     with gr.Group(elem_id="km-console"):
         gr.HTML(

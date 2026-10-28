@@ -23,6 +23,10 @@ EXAMPLES = [
     {"icon": "🏛", "chip": "PM-KISAN பதிவு?", "lang_code": "TA", "question": "PM-KISAN கீழ் நான் எவ்வாறு பதிவு செய்வது?", "language": "Tamil"},
     {"icon": "🌽", "chip": "Maize fertilizer?", "lang_code": "EN", "question": "What is the fertilizer schedule for hybrid maize?", "language": "English"},
     {"icon": "💧", "chip": "చుక్క సబ్సిడీ?", "lang_code": "TE", "question": "చుక్క నీటిపారుదల సబ్సిడీ ఎలా పొందాలి?", "language": "Telugu"},
+    {"icon": "🌱", "chip": "ಗುಲಾಬಿ ಹುಳು?", "lang_code": "KN", "question": "ಹತ್ತಿ ಬೆಳೆಯಲ್ಲಿ ಗುಲಾಬಿ ಕಾಯಿ ಹುಳುವನ್ನು ಹೇಗೆ ನಿಯಂತ್ರಿಸುವುದು?", "language": "Kannada"},
+    {"icon": "🏦", "chip": "किसान क्रेडिट कार्ड?", "lang_code": "HI", "question": "किसान क्रेडिट कार्ड कैसे बनवाएं?", "language": "Hindi"},
+    {"icon": "🧅", "chip": "कांदा साठवण?", "lang_code": "MR", "question": "कांदा साठवणुकीची योग्य पद्धत कोणती आहे?", "language": "Marathi"},
+    {"icon": "🏛", "chip": "পিএম-কিষান?", "lang_code": "BN", "question": "পিএম-কিষান এর জন্য কীভাবে নিবন্ধন করব?", "language": "Bengali"},
 ]
 
 CROP_ICONS = {
@@ -107,7 +111,8 @@ footer { display: none !important; }
 @keyframes km-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
 
 #km-hero .km-kicker { font-family: 'IBM Plex Mono', monospace; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--km-fg-dim); margin: 0 0 6px; position: relative; }
-#km-hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.3rem; letter-spacing: -.01em; margin: 2px 0; color: var(--km-fg) !important; position: relative; }
+.km-lockup { display: flex; align-items: center; gap: 10px; position: relative; }
+#km-hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.3rem; letter-spacing: -.01em; margin: 2px 0; color: var(--km-fg) !important; }
 #km-hero .km-lede { color: var(--km-fg-dim); font-size: .98rem; line-height: 1.55; max-width: 48ch; margin: 0; position: relative; }
 
 /* ---- input row ---- */
@@ -266,7 +271,17 @@ with gr.Blocks(css=CUSTOM_CSS, theme=THEME, title="Kisan Mitra — AI Farmer Adv
                 <span class="km-status-chip"><span class="km-dot"></span>Live · Retrieval-grounded</span>
             </div>
             <p class="km-kicker">Field Advisory Console</p>
-            <h1>Kisan Mitra</h1>
+            <div class="km-lockup">
+                <svg width="46" height="46" viewBox="0 0 44 44" fill="none">
+                    <circle cx="22" cy="22" r="20" stroke="var(--km-accent)" stroke-width="1.2" opacity="0.35"/>
+                    <circle cx="22" cy="22" r="15.5" fill="var(--km-surface-2)"/>
+                    <path d="M22 30.5c-6-2.5-9-7.5-9-13.5 0-3.5 2-7 5.5-8.5-1 3.5 0 7 2.5 9.5 2.5-2.5 3.5-6 2.5-9.5 3.5 1.5 5.5 5 5.5 8.5 0 6-3 11-9 13.5Z" fill="var(--km-accent)"/>
+                    <path d="M22 30.5V16" stroke="var(--km-surface-2)" stroke-width="1.2"/>
+                    <path d="M30 13.5c1.6 1.6 1.6 4.3 0 5.9" stroke="var(--km-accent)" stroke-width="1.3" stroke-linecap="round" opacity="0.85"/>
+                    <path d="M32.8 10.7c3.1 3.1 3.1 8.3 0 11.4" stroke="var(--km-accent)" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+                </svg>
+                <h1>Kisan Mitra</h1>
+            </div>
             <p class="km-lede">Ask in your own language — crops, irrigation, pests, fertilizer,
             government schemes. Every answer is traced back to the source it was grounded on,
             shown below.</p>

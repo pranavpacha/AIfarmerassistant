@@ -1,5 +1,5 @@
 torch>=2.5
-transformers>=4.51
+transformers>=4.51,<5.0.0
 accelerate>=0.33
 bitsandbytes>=0.43
 sentencepiece

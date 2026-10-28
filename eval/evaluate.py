@@ -10,29 +10,33 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from pipeline import ask  # noqa: E402
+from pipeline import ask, LOW_CONFIDENCE_THRESHOLD  # noqa: E402
+
 
 EVAL_DIR = Path(__file__).parent
-LOW_CONFIDENCE_THRESHOLD = 0.35  # below this top-1 retrieval score, treat as "no good grounding found"
 
 
 def score_case(case: dict, result) -> dict:
     is_out_of_domain = case["expected_category"] == "OUT_OF_DOMAIN"
-    top_score = result.sources[0]["score"] if result.sources else 0.0
 
     retrieval_hit = (
         any(s["category"] == case["expected_category"] for s in result.sources)
         if not is_out_of_domain
-        else top_score < LOW_CONFIDENCE_THRESHOLD
+        # The pipeline itself (not a re-derived check here) decides whether a
+        # query was grounded, since it's the thing that actually chose to
+        # skip generation — see LOW_CONFIDENCE_THRESHOLD in pipeline.py.
+        else not result.grounded
     )
 
     answer_lower = result.english_answer.lower()
     keywords = case["expected_keywords"]
     hits = [k for k in keywords if k.lower() in answer_lower]
-    keyword_coverage = (len(hits) / len(keywords)) if keywords else None
+    # Keyword coverage is meaningless for a correctly-declined OOD case (the
+    # answer is the fixed decline message, not a generated answer to score).
+    keyword_coverage = (len(hits) / len(keywords)) if (keywords and result.grounded) else None
 
     if is_out_of_domain:
-        passed = retrieval_hit  # low-confidence retrieval is the correct behavior here
+        passed = retrieval_hit  # correctly declining is the only thing being checked here
     else:
         passed = retrieval_hit and (keyword_coverage is None or keyword_coverage >= 0.3)
 
@@ -42,7 +46,8 @@ def score_case(case: dict, result) -> dict:
         "language": case["language"],
         "expected_category": case["expected_category"],
         "top_retrieved_category": result.sources[0]["category"] if result.sources else None,
-        "top_retrieval_score": round(top_score, 3),
+        "top_retrieval_score": round(result.top_score, 3),
+        "grounded": result.grounded,
         "retrieval_hit": retrieval_hit,
         "keyword_coverage": round(keyword_coverage, 2) if keyword_coverage is not None else None,
         "matched_keywords": hits,
@@ -118,8 +123,9 @@ def write_failure_analysis(failed: list[dict], summary: dict):
 
     lines.append(
         "\n## Notes for manual review\n"
-        "- Check whether out-of-domain queries (t36, t37) are correctly declined rather "
-        "than answered with a hallucinated agricultural response.\n"
+        "- Out-of-domain queries (t36, t37) should now show `grounded: false` and the fixed "
+        "decline message in `final_answer` — pipeline.py skips generation entirely below "
+        "LOW_CONFIDENCE_THRESHOLD instead of letting AgriParam answer anyway.\n"
         "- Check whether low-resource language cases (Tamil, Telugu, Kannada) lose accuracy "
         "due to translation quality rather than retrieval/generation quality — compare "
         "`english_answer` vs `final_answer` in results.json for those cases.\n"

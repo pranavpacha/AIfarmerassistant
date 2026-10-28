@@ -165,8 +165,18 @@ footer { display: none !important; }
 #km-answer-wrap { margin-top: 20px; animation: km-rise .55s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes km-rise { from { opacity: 0; transform: translateY(14px) scale(.98) rotateX(-4deg); } to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); } }
 .km-answer-card { border-radius: 16px; border: 1px solid var(--km-border); background: var(--km-surface); overflow: hidden; }
+.km-answer-unsourced { border-color: color-mix(in srgb, var(--km-accent-2) 45%, var(--km-border)); }
 .km-answer-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--km-border); background: var(--km-surface-2); }
+.km-answer-head-right { display: flex; align-items: center; gap: 10px; }
 .km-answer-head .km-timing { font-family: 'IBM Plex Mono', monospace; font-size: .68rem; color: var(--km-fg-dim); }
+.km-status-warn { color: var(--km-accent-2) !important; background: color-mix(in srgb, var(--km-accent-2) 12%, transparent) !important; border-color: color-mix(in srgb, var(--km-accent-2) 35%, transparent) !important; }
+.km-status-warn .km-dot { background: var(--km-accent-2) !important; }
+.km-copy-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: .68rem; color: var(--km-fg-dim);
+    background: var(--km-surface); border: 1px solid var(--km-border); border-radius: 6px;
+    padding: 3px 9px; cursor: pointer; transition: border-color .15s, color .15s;
+}
+.km-copy-btn:hover { border-color: var(--km-accent); color: var(--km-accent); }
 .km-answer-body { padding: 18px; font-size: 1.02rem; line-height: 1.7; }
 
 /* ---- sources (3D perspective hover + staggered reveal) ---- */
@@ -193,7 +203,8 @@ footer { display: none !important; }
 .km-tag { font-family: 'IBM Plex Mono', monospace; font-size: .62rem; letter-spacing: .02em; color: var(--km-fg-dim);
     background: var(--km-surface-2); border: 1px solid var(--km-border); border-radius: 5px; padding: 2px 6px; }
 .km-score { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-family: 'IBM Plex Mono', monospace; }
-.km-score .km-val { font-size: .76rem; color: var(--km-accent); }
+.km-score .km-val { font-size: .76rem; color: var(--km-accent); font-weight: 500; }
+.km-score .km-val-num { font-size: .62rem; color: var(--km-fg-dim); }
 .km-bar { width: 58px; height: 4px; border-radius: 99px; background: var(--km-surface-2); overflow: hidden; }
 .km-bar i { display: block; height: 100%; background: var(--km-accent); border-radius: 99px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
 
@@ -246,6 +257,33 @@ def crop_icon(crop: str) -> str:
     return CROP_ICONS.get(crop, "🛰")
 
 
+def confidence_label(score: float) -> str:
+    # Plain-language bands instead of a raw similarity score: a number like
+    # "0.64" means nothing to most users without context on the scale, and
+    # research on AI-answer UX specifically flags raw confidence numbers as
+    # something people can't act on. The number is still shown (smaller,
+    # secondary) for anyone who does want the precise value.
+    if score >= 0.7:
+        return "Strong match"
+    if score >= 0.5:
+        return "Good match"
+    if score >= 0.35:
+        return "Partial match"
+    return "Weak match"
+
+
+def js_attr_escape(text: str) -> str:
+    """Escape text for embedding as a JS single-quoted string literal inside
+    an HTML double-quoted attribute. Order matters: JS-escape first (so a
+    literal backslash or quote in the answer becomes a valid JS escape
+    sequence), then HTML-escape the result so a literal `"` in the answer
+    can't prematurely close the onclick="..." attribute — the browser decodes
+    the HTML entities back to real characters before handing the string to
+    the JS engine, so the JS escaping underneath still applies correctly."""
+    js_safe = text.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "")
+    return html.escape(js_safe)
+
+
 EMPTY_STATE_HTML = (
     "<div class='km-answer-card'>"
     "<div class='km-answer-head'>"
@@ -257,13 +295,29 @@ EMPTY_STATE_HTML = (
 )
 
 
-def render_answer(answer_text: str, elapsed: float) -> str:
+def render_answer(answer_text: str, elapsed: float, grounded: bool) -> str:
     safe_text = html.escape(answer_text).replace("\n", "<br>")
+    copy_js = js_attr_escape(answer_text)
+    if grounded:
+        badge = "<span class='km-status-chip'><span class='km-dot'></span>Grounded answer</span>"
+    else:
+        # A distinct, honestly-worded state for low-confidence queries, instead
+        # of showing the same "Grounded answer" badge regardless of whether
+        # anything was actually found — see LOW_CONFIDENCE_THRESHOLD in
+        # pipeline.py and eval/failure_analysis.md for why this matters: an
+        # LLM given weak context will still answer confidently unless the
+        # application itself refuses to ask it to.
+        badge = "<span class='km-status-chip km-status-warn'><span class='km-dot'></span>No match found</span>"
     return (
-        "<div class='km-answer-card'>"
+        f"<div class='km-answer-card{'' if grounded else ' km-answer-unsourced'}'>"
         "<div class='km-answer-head'>"
-        "<span class='km-status-chip'><span class='km-dot'></span>Grounded answer</span>"
+        f"{badge}"
+        "<span class='km-answer-head-right'>"
         f"<span class='km-timing'>{elapsed:.1f}s</span>"
+        f"<button class='km-copy-btn' onclick=\"navigator.clipboard.writeText('{copy_js}').then(() => {{"
+        "const t=this.textContent; this.textContent='Copied'; setTimeout(() => this.textContent=t, 1400);"
+        "})\">Copy</button>"
+        "</span>"
         "</div>"
         f"<div class='km-answer-body'>{safe_text}</div>"
         "</div>"
@@ -285,7 +339,8 @@ def render_sources(sources: list[dict]) -> str:
             f"<span class='km-tag'>{html.escape(s['category'])}</span></div>"
             "</div>"
             "<div class='km-score'>"
-            f"<span class='km-val'>{s['score']:.2f}</span>"
+            f"<span class='km-val'>{confidence_label(s['score'])}</span>"
+            f"<span class='km-val-num'>{s['score']:.2f}</span>"
             f"<div class='km-bar'><i style='width:{pct}%'></i></div>"
             "</div>"
             "</div>"
@@ -299,7 +354,11 @@ def handle_ask(question: str, language: str):
     start = time.time()
     result = ask(question, language)
     elapsed = time.time() - start
-    return render_answer(result.answer, elapsed), render_sources(result.sources), gr.update(open=True)
+    return (
+        render_answer(result.answer, elapsed, result.grounded),
+        render_sources(result.sources),
+        gr.update(open=True),
+    )
 
 
 def handle_chip(question: str, language: str):

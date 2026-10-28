@@ -41,6 +41,12 @@ class AgriParamClient:
             top_p=0.9,
             repetition_penalty=1.15,
             pad_token_id=self.tokenizer.eos_token_id,
+            # AgriParam's custom modeling code (modeling_parambharatgen.py) indexes
+            # past_key_values with the old tuple-of-tensors layout; current transformers
+            # passes a Cache object whose per-layer entries start as None, which breaks
+            # that code's `.shape` access. Disabling the cache avoids that broken path
+            # entirely (slower generation, but correct).
+            use_cache=False,
         )
         generated = output[0][inputs["input_ids"].shape[1]:]
         text = self.tokenizer.decode(generated, skip_special_tokens=True)

@@ -10,14 +10,20 @@ MODEL_NAME = "bharatgenai/AgriParam"
 
 
 class AgriParamClient:
-    def __init__(self, load_in_4bit: bool = True):
+    # 4-bit quantization is skipped by default: with use_cache=False below, every
+    # generation step recomputes full attention from scratch, and bnb's per-op
+    # dequantization overhead compounds badly under that workload. FP16 is both
+    # faster here and well within a T4's 16GB VRAM for a 3B model (~6GB).
+    def __init__(self, load_in_4bit: bool = False):
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=False)
         kwargs = dict(trust_remote_code=True, device_map="auto")
         if torch.cuda.is_available():
             if load_in_4bit:
                 kwargs["load_in_4bit"] = True
             else:
-                kwargs["torch_dtype"] = torch.bfloat16
+                # bfloat16 is NOT well-accelerated on T4 (Turing lacks native BF16
+                # tensor cores); float16 is what T4 is actually fast at.
+                kwargs["torch_dtype"] = torch.float16
         else:
             kwargs["torch_dtype"] = torch.float32
         self.model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, **kwargs)

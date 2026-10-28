@@ -15,12 +15,14 @@ from pipeline import ask
 
 LANGUAGES = ["English", "Hindi", "Tamil", "Telugu", "Kannada", "Marathi", "Bengali"]
 
+# "chip" is a short display label (shown with its language so the multilingual
+# range is visible at a glance); "question" is the full real query actually sent.
 EXAMPLES = [
-    {"icon": "🌾", "label": "stem borer · paddy", "question": "How do I control stem borer in paddy?", "language": "English"},
-    {"icon": "🌿", "label": "wheat sowing", "question": "गेहूं की बुवाई का सही समय क्या है?", "language": "Hindi"},
-    {"icon": "🏛", "label": "PM-KISAN", "question": "PM-KISAN கீழ் நான் எவ்வாறு பதிவு செய்வது?", "language": "Tamil"},
-    {"icon": "🌽", "label": "maize fertilizer", "question": "What is the fertilizer schedule for hybrid maize?", "language": "English"},
-    {"icon": "💧", "label": "drip subsidy", "question": "చుక్క నీటిపారుదల సబ్సిడీ ఎలా పొందాలి?", "language": "Telugu"},
+    {"icon": "🌾", "chip": "Stem borer in paddy?", "lang_code": "EN", "question": "How do I control stem borer in paddy?", "language": "English"},
+    {"icon": "🌿", "chip": "गेहूं की बुवाई?", "lang_code": "HI", "question": "गेहूं की बुवाई का सही समय क्या है?", "language": "Hindi"},
+    {"icon": "🏛", "chip": "PM-KISAN பதிவு?", "lang_code": "TA", "question": "PM-KISAN கீழ் நான் எவ்வாறு பதிவு செய்வது?", "language": "Tamil"},
+    {"icon": "🌽", "chip": "Maize fertilizer?", "lang_code": "EN", "question": "What is the fertilizer schedule for hybrid maize?", "language": "English"},
+    {"icon": "💧", "chip": "చుక్క సబ్సిడీ?", "lang_code": "TE", "question": "చుక్క నీటిపారుదల సబ్సిడీ ఎలా పొందాలి?", "language": "Telugu"},
 ]
 
 CROP_ICONS = {
@@ -30,7 +32,7 @@ CROP_ICONS = {
 }
 
 CUSTOM_CSS = """
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Bengali:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Bengali:wght@400;600&display=swap');
 
 :root {
     --km-bg: #f4f8f5; --km-surface: #ffffff; --km-surface-2: #eaf2ec; --km-border: #d3e0d7;
@@ -43,6 +45,10 @@ CUSTOM_CSS = """
     }
 }
 
+/* The gradio-container is centered with a max-width, which otherwise leaves an
+   unstyled (browser-default, often black in dark mode) void on either side. */
+html, body { background: var(--km-bg) !important; margin: 0; }
+
 .gradio-container {
     font-family: 'IBM Plex Sans', 'Noto Sans Devanagari', 'Noto Sans Tamil', 'Noto Sans Telugu',
                  'Noto Sans Kannada', 'Noto Sans Bengali', sans-serif !important;
@@ -52,6 +58,21 @@ CUSTOM_CSS = """
 }
 .gradio-container, .gradio-container * { color: var(--km-fg); }
 footer { display: none !important; }
+
+/* Dropdown popup (language selector) — unstyled by default, falls back to the
+   browser/OS dark popup chrome which clashes with the rest of the theme. */
+.gradio-container ul[role="listbox"],
+.gradio-container .options {
+    background: var(--km-surface) !important; border: 1px solid var(--km-border) !important;
+    border-radius: 10px !important; box-shadow: 0 12px 28px -12px rgba(0,0,0,.35) !important;
+}
+.gradio-container li[role="option"], .gradio-container .item {
+    color: var(--km-fg) !important; font-family: 'IBM Plex Sans', sans-serif !important;
+}
+.gradio-container li[role="option"]:hover, .gradio-container .item:hover,
+.gradio-container li[aria-selected="true"], .gradio-container .item.selected {
+    background: var(--km-surface-2) !important; color: var(--km-accent) !important;
+}
 
 /* ---- hero ---- */
 #km-hero {
@@ -86,7 +107,7 @@ footer { display: none !important; }
 @keyframes km-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
 
 #km-hero .km-kicker { font-family: 'IBM Plex Mono', monospace; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--km-fg-dim); margin: 0 0 6px; position: relative; }
-#km-hero h1 { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 2.1rem; margin: 2px 0; color: var(--km-fg) !important; position: relative; }
+#km-hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.3rem; letter-spacing: -.01em; margin: 2px 0; color: var(--km-fg) !important; position: relative; }
 #km-hero .km-lede { color: var(--km-fg-dim); font-size: .98rem; line-height: 1.55; max-width: 48ch; margin: 0; position: relative; }
 
 /* ---- input row ---- */
@@ -104,8 +125,8 @@ footer { display: none !important; }
     text-transform: uppercase !important; color: var(--km-fg-dim) !important;
 }
 
-#km-ask-btn, .km-chip {
-    font-family: 'Chakra Petch', sans-serif !important; font-weight: 600 !important; letter-spacing: .02em !important;
+#km-ask-btn {
+    font-family: 'Syne', sans-serif !important; font-weight: 700 !important; letter-spacing: .02em !important;
 }
 #km-ask-btn {
     background: var(--km-accent) !important; border: none !important; color: #06130b !important;
@@ -117,7 +138,12 @@ footer { display: none !important; }
 /* ---- example chips ---- */
 #km-chip-row { gap: 8px !important; flex-wrap: wrap !important; }
 .km-chip {
-    font-family: 'IBM Plex Mono', monospace !important; font-size: .74rem !important; color: var(--km-fg-dim) !important;
+    /* Chip labels include native-script text (Hindi/Tamil/Telugu), so the mono
+       face needs the same Noto Sans fallback stack as the rest of the page —
+       IBM Plex Mono alone doesn't cover those scripts. */
+    font-family: 'IBM Plex Mono', 'Noto Sans Devanagari', 'Noto Sans Tamil', 'Noto Sans Telugu',
+                 'Noto Sans Kannada', 'Noto Sans Bengali', monospace !important;
+    font-size: .74rem !important; color: var(--km-fg-dim) !important;
     background: var(--km-surface-2) !important; border: 1px solid var(--km-border) !important;
     border-radius: 99px !important; padding: 4px 13px !important; min-width: 0 !important; box-shadow: none !important;
     transition: border-color .15s, color .15s, transform .15s !important;
@@ -259,7 +285,7 @@ with gr.Blocks(css=CUSTOM_CSS, theme=THEME, title="Kisan Mitra — AI Farmer Adv
 
     with gr.Row(elem_id="km-chip-row"):
         chip_buttons = [
-            gr.Button(f"{ex['icon']} {ex['label']}", elem_classes=["km-chip"], size="sm")
+            gr.Button(f"{ex['icon']} {ex['chip']}  ({ex['lang_code']})", elem_classes=["km-chip"], size="sm")
             for ex in EXAMPLES
         ]
     ask_btn = gr.Button("Ask →", elem_id="km-ask-btn", size="lg")

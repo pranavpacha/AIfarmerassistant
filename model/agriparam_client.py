@@ -60,8 +60,12 @@ class AgriParamClient:
                 # released promptly).
                 use_cache=False,
             )
-            generated = output[0][inputs["input_ids"].shape[1]:]
-            text = self.tokenizer.decode(generated, skip_special_tokens=True)
+            # Slice inline rather than binding to a name: a bound slice is a view
+            # that shares storage with `output`, so `del output` below wouldn't
+            # actually free that memory while the view is still a live local.
+            text = self.tokenizer.decode(
+                output[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True
+            )
             return text.split("</assistant>")[0].strip()
         finally:
             del inputs

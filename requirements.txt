@@ -1,13 +1,13 @@
 torch>=2.5
 transformers>=4.51,<5.0.0
+huggingface_hub>=0.34.0,<1.0
 accelerate>=0.33
 bitsandbytes>=0.43
 sentencepiece
 IndicTransToolkit
 sentence-transformers>=3.0
 faiss-cpu
-gradio>=4.40
-huggingface_hub
+gradio>=5.0,<6.0
 requests
 pandas
 numpy>=2.1

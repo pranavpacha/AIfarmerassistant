@@ -22,7 +22,7 @@ This project is designed to run on **Google Colab** (development) and **Hugging 
 3. Open https://www.data.gov.in/resource/kisan-call-centre-kcc-transcripts-farmers-queries-answers while logged in and copy the resource UUID from the page's URL/API section
 4. Set both `DATA_GOV_IN_API_KEY` and `KCC_RESOURCE_ID` before running `data/fetch_kcc_data.py`
 
-   Without this key, the project still runs fully using the curated seed corpus in `data/seed_corpus.json` (~60 real agronomic advisory entries) — the API just lets you expand the retrieval corpus to the full official dataset.
+   Without this key, the project still runs fully using the curated seed corpus in `data/seed_corpus.json` (30 real agronomic advisory entries) — the API just lets you expand the retrieval corpus to the full official dataset.
 
 ## 2. Running in Colab (development)
 
@@ -33,10 +33,10 @@ Open `notebooks/colab_dev.ipynb` in Colab, set Runtime → Change runtime type �
 ```bash
 pip install huggingface_hub
 huggingface-cli login
-huggingface-cli repo create kisan-mitra --type space --space_sdk gradio
-git clone https://huggingface.co/spaces/<your-username>/kisan-mitra
-# copy app.py, model/, rag/, data/seed_corpus.json, requirements.txt into that folder
-cd kisan-mitra
+huggingface-cli repo create ai-farmer-assistant --type space --space_sdk gradio
+git clone https://huggingface.co/spaces/<your-username>/ai-farmer-assistant
+# copy app.py, pipeline.py, model/, rag/, data/seed_corpus.json, requirements.txt into that folder
+cd ai-farmer-assistant
 git add . && git commit -m "Deploy Kisan Mitra" && git push
 ```
 

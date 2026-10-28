@@ -1,6 +1,7 @@
 """Load BharatGen AgriParam and generate grounded advisory answers from
 retrieved context, using the model's documented <user>/<context>/<assistant>
 prompt format."""
+import gc
 from functools import lru_cache
 
 import torch
@@ -36,27 +37,38 @@ class AgriParamClient:
         )
 
     @torch.inference_mode()
-    def answer(self, question: str, context: str, max_new_tokens: int = 256) -> str:
+    def answer(self, question: str, context: str, max_new_tokens: int = 200) -> str:
         prompt = self._build_prompt(question, context)
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
-        output = self.model.generate(
-            **inputs,
-            max_new_tokens=max_new_tokens,
-            do_sample=True,
-            temperature=0.3,
-            top_p=0.9,
-            repetition_penalty=1.15,
-            pad_token_id=self.tokenizer.eos_token_id,
-            # AgriParam's custom modeling code (modeling_parambharatgen.py) indexes
-            # past_key_values with the old tuple-of-tensors layout; current transformers
-            # passes a Cache object whose per-layer entries start as None, which breaks
-            # that code's `.shape` access. Disabling the cache avoids that broken path
-            # entirely (slower generation, but correct).
-            use_cache=False,
-        )
-        generated = output[0][inputs["input_ids"].shape[1]:]
-        text = self.tokenizer.decode(generated, skip_special_tokens=True)
-        return text.split("</assistant>")[0].strip()
+        output = None
+        try:
+            output = self.model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=0.3,
+                top_p=0.9,
+                repetition_penalty=1.15,
+                pad_token_id=self.tokenizer.eos_token_id,
+                # AgriParam's custom modeling code (modeling_parambharatgen.py) indexes
+                # past_key_values with the old tuple-of-tensors layout; current transformers
+                # passes a Cache object whose per-layer entries start as None, which breaks
+                # that code's `.shape` access. Disabling the cache avoids that broken path
+                # entirely, at the cost of recomputing full attention every step, which is
+                # why this needs explicit cleanup below (that recompute cost compounds
+                # across many calls in the same process if left-over activations aren't
+                # released promptly).
+                use_cache=False,
+            )
+            generated = output[0][inputs["input_ids"].shape[1]:]
+            text = self.tokenizer.decode(generated, skip_special_tokens=True)
+            return text.split("</assistant>")[0].strip()
+        finally:
+            del inputs
+            del output
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
 
 
 @lru_cache(maxsize=1)

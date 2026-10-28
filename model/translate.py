@@ -1,5 +1,6 @@
 """Wraps the AI4Bharat IndicTrans2 distilled 200M checkpoints for indic->english
 (query understanding) and english->indic (answer delivery) translation."""
+import gc
 from functools import lru_cache
 
 import torch
@@ -38,22 +39,36 @@ class _Direction:
         inputs = self.tokenizer(
             batch, truncation=True, padding="longest", max_length=256, return_tensors="pt"
         ).to(DEVICE)
-        output_tokens = self.model.generate(
-            **inputs,
-            num_beams=5,
-            num_return_sequences=1,
-            max_length=256,
-            # AI4Bharat's custom modeling_indictrans.py has the same legacy
-            # tuple-cache assumption as AgriParam (see agriparam_client.py) —
-            # `past_key_values[0][0].shape` crashes under the Cache object current
-            # transformers passes by default. This model is only 200M params, so
-            # disabling cache costs negligible speed unlike the 3B AgriParam.
-            use_cache=False,
-        )
-        decoded = self.tokenizer.batch_decode(
-            output_tokens, skip_special_tokens=True, clean_up_tokenization_spaces=True
-        )
-        return self.processor.postprocess_batch(decoded, lang=tgt_lang)
+        output_tokens = None
+        try:
+            output_tokens = self.model.generate(
+                **inputs,
+                # Beam search multiplies no-cache memory cost by num_beams (each
+                # beam does its own full recompute at every step); greedy decoding
+                # avoids that multiplier. Quality loss is minor for short advisory
+                # sentences and this was a real contributor to CUDA OOM on a T4
+                # once AgriParam's ~5.4GB was also resident.
+                num_beams=1,
+                do_sample=False,
+                num_return_sequences=1,
+                max_length=256,
+                # AI4Bharat's custom modeling_indictrans.py has the same legacy
+                # tuple-cache assumption as AgriParam (see agriparam_client.py) —
+                # `past_key_values[0][0].shape` crashes under the Cache object current
+                # transformers passes by default. This model is only 200M params, so
+                # disabling cache costs negligible speed unlike the 3B AgriParam.
+                use_cache=False,
+            )
+            decoded = self.tokenizer.batch_decode(
+                output_tokens, skip_special_tokens=True, clean_up_tokenization_spaces=True
+            )
+            return self.processor.postprocess_batch(decoded, lang=tgt_lang)
+        finally:
+            del inputs
+            del output_tokens
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
 
 
 @lru_cache(maxsize=1)

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.env
+*.faiss
+rag/index/
+data/kcc_raw.json
+data/kcc_raw.csv
+data/corpus.json
+.ipynb_checkpoints/
+*.egg-info/

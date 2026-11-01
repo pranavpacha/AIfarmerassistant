@@ -1,0 +1,99 @@
+"""Load BharatGen AgriParam and generate grounded advisory answers from
+retrieved context, using the model's documented <user>/<context>/<assistant>
+prompt format."""
+import gc
+from functools import lru_cache
+
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+MODEL_NAME = "bharatgenai/AgriParam"
+
+
+class AgriParamClient:
+    # 4-bit by default: FP16 (~5.4GB) left too little headroom once both
+    # translation models and the embedding model were also resident on a T4 —
+    # use_cache=False generation then OOM'd on essentially every call once all
+    # three were loaded. 4-bit (~2GB) trades generation speed for reliably
+    # fitting everything at once, which matters more for a one-time eval batch
+    # than per-query latency does.
+    def __init__(self, load_in_4bit: bool = True):
+        self.tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=False)
+        kwargs = dict(trust_remote_code=True, device_map="auto")
+        if torch.cuda.is_available():
+            if load_in_4bit:
+                kwargs["load_in_4bit"] = True
+            else:
+                # bfloat16 is NOT well-accelerated on T4 (Turing lacks native BF16
+                # tensor cores); float16 is what T4 is actually fast at.
+                kwargs["torch_dtype"] = torch.float16
+        else:
+            kwargs["torch_dtype"] = torch.float32
+        self.model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, **kwargs)
+        self.model.eval()
+
+        if not torch.cuda.is_available():
+            # CPU deployment (e.g. a free Hugging Face Space has no GPU): raw
+            # FP32 for this 3B model is ~12GB, which leaves under 1GB of
+            # headroom out of a 16GB free-tier instance once the two
+            # translation models, the embedding model, and the Gradio server
+            # itself are also resident — a real risk of the whole process
+            # getting OOM-killed on startup, not just running slowly.
+            # bitsandbytes (used for the 4-bit path above) isn't reliably
+            # supported on CPU, so this uses PyTorch's own built-in dynamic
+            # INT8 quantization instead — no extra dependency, and it roughly
+            # halves the model's memory footprint. This only runs on the
+            # no-GPU path; it has no effect on, and was not present during,
+            # the GPU run that produced the 34/38 eval result.
+            self.model = torch.quantization.quantize_dynamic(
+                self.model, {torch.nn.Linear}, dtype=torch.qint8
+            )
+
+    def _build_prompt(self, question: str, context: str) -> str:
+        return (
+            f"<context>\n{context}\n</context>\n"
+            f"<user>{question}</user>\n<assistant>"
+        )
+
+    @torch.inference_mode()
+    def answer(self, question: str, context: str, max_new_tokens: int = 180) -> str:
+        prompt = self._build_prompt(question, context)
+        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        output = None
+        try:
+            output = self.model.generate(
+                **inputs,
+                max_new_tokens=max_new_tokens,
+                do_sample=True,
+                temperature=0.3,
+                top_p=0.9,
+                repetition_penalty=1.15,
+                pad_token_id=self.tokenizer.eos_token_id,
+                # AgriParam's custom modeling code (modeling_parambharatgen.py) indexes
+                # past_key_values with the old tuple-of-tensors layout; current transformers
+                # passes a Cache object whose per-layer entries start as None, which breaks
+                # that code's `.shape` access. Disabling the cache avoids that broken path
+                # entirely, at the cost of recomputing full attention every step, which is
+                # why this needs explicit cleanup below (that recompute cost compounds
+                # across many calls in the same process if left-over activations aren't
+                # released promptly).
+                use_cache=False,
+            )
+            # Slice inline rather than binding to a name: a bound slice is a view
+            # that shares storage with `output`, so `del output` below wouldn't
+            # actually free that memory while the view is still a live local.
+            text = self.tokenizer.decode(
+                output[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True
+            )
+            return text.split("</assistant>")[0].strip()
+        finally:
+            del inputs
+            del output
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
+
+@lru_cache(maxsize=1)
+def get_agriparam() -> AgriParamClient:
+    return AgriParamClient()

@@ -191,7 +191,7 @@ footer { display: none !important; }
     padding: 3px 9px; cursor: pointer; transition: border-color .15s, color .15s;
 }
 .km-copy-btn:hover { border-color: var(--km-accent); color: var(--km-accent); }
-.km-answer-body { padding: 18px; font-size: 1.02rem; line-height: 1.7; }
+.km-answer-body { padding: 18px; font-size: 1.02rem; line-height: 1.7; color: var(--km-fg) !important; }
 
 /* ---- sources (3D perspective hover + staggered reveal) ---- */
 #km-sources-accordion { margin-top: 12px; background: transparent !important; border: none !important; }
@@ -212,7 +212,7 @@ footer { display: none !important; }
 .km-src-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
     background: color-mix(in srgb, var(--km-accent) 14%, transparent); flex: none; font-size: 1rem; }
 .km-src-main { min-width: 0; }
-.km-src-q { font-weight: 600; font-size: .9rem; margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.km-src-q { font-weight: 600; font-size: .9rem; margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--km-fg) !important; }
 .km-src-tags { display: flex; gap: 6px; flex-wrap: wrap; }
 .km-tag { font-family: 'IBM Plex Mono', monospace; font-size: .62rem; letter-spacing: .02em; color: var(--km-fg-dim);
     background: var(--km-surface-2); border: 1px solid var(--km-border); border-radius: 5px; padding: 2px 6px; }

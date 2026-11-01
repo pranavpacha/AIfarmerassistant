@@ -177,6 +177,13 @@ footer { display: none !important; }
 
 /* ---- answer card ---- */
 #km-answer-wrap { margin-top: 20px; animation: km-rise .55s cubic-bezier(.2,.8,.2,1) both; }
+/* Gradio applies a "generating/pending" opacity fade to output components
+   while a call is in flight, and in some versions doesn't reliably clear it
+   once the result lands — forcing full opacity here overrides that stuck
+   fade regardless of which Gradio internal class/state caused it. */
+#km-answer-wrap, #km-answer-wrap *, #km-sources-accordion, #km-sources-accordion * {
+    opacity: 1 !important;
+}
 @keyframes km-rise { from { opacity: 0; transform: translateY(14px) scale(.98) rotateX(-4deg); } to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); } }
 .km-answer-card { border-radius: 16px; border: 1px solid var(--km-border); background: var(--km-surface); overflow: hidden; }
 .km-answer-unsourced { border-color: color-mix(in srgb, var(--km-accent-2) 45%, var(--km-border)); }

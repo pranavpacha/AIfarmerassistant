@@ -184,6 +184,31 @@ footer { display: none !important; }
 #km-answer-wrap, #km-answer-wrap *, #km-sources-accordion, #km-sources-accordion * {
     opacity: 1 !important;
 }
+/* Forcing opacity:1 above revealed a second, related bug: a Gradio wrapper
+   element inside the accordion carries its own (dark) background color,
+   which was invisible while opacity was stuck low and became a solid black
+   box once opacity was corrected. Force every element in the accordion
+   transparent, then re-assert our own source cards' white background with
+   higher specificity (#id + .class beats the #id + * rule below) so they
+   aren't swept up by the same blanket rule. */
+#km-sources-accordion * {
+    background: transparent !important;
+}
+#km-sources-accordion .km-src {
+    background: var(--km-surface) !important;
+}
+#km-sources-accordion .km-src-icon {
+    background: color-mix(in srgb, var(--km-accent) 14%, transparent) !important;
+}
+#km-sources-accordion .km-tag {
+    background: var(--km-surface-2) !important;
+}
+#km-sources-accordion .km-bar {
+    background: var(--km-surface-2) !important;
+}
+#km-sources-accordion .km-bar i {
+    background: var(--km-accent) !important;
+}
 @keyframes km-rise { from { opacity: 0; transform: translateY(14px) scale(.98) rotateX(-4deg); } to { opacity: 1; transform: translateY(0) scale(1) rotateX(0); } }
 .km-answer-card { border-radius: 16px; border: 1px solid var(--km-border); background: var(--km-surface); overflow: hidden; }
 .km-answer-unsourced { border-color: color-mix(in srgb, var(--km-accent-2) 45%, var(--km-border)); }
